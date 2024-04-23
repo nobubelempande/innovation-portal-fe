@@ -1,44 +1,95 @@
-import { Button, TextField, Typography } from '@mui/material';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import * as Yup from 'yup';
 import './App.css';
 
 function App() {
+
+  const validationSchema = Yup.object().shape({
+    name: Yup.string()
+      .required('Name is required'),
+    surname: Yup.string()
+      .required('Surname is required'),
+    email: Yup.string()
+      .email('Invalid email')
+      .required('Email is required'),
+    password: Yup.string()
+      .required('Password is required'),
+    confirm: Yup.string()
+      .required('Password is required'),
+
+  });
+
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    try {
+      const response = await fetch('YOUR_BACKEND_ENDPOINT', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error submitting form');
+      }
+
+      resetForm();
+      alert('Form submitted successfully!');
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error submitting form');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
-
-    //TO: Refactor and use correct principles
-    <div style={{ backgroundColor: '#990f02', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <div style={{ backgroundColor: '#FF7F7F', borderRadius: '24px', margin: '24px', padding: '24px', width: '600px' }}>
-        <div>
-          <span style={{ display: 'flex', justifyContent: 'center' }}>
-            <p style={{ color: 'white', paddingRight: '2px' }}>Already have an account?</p>
-            <p style={{ color: 'red' }}> Log in</p>
-          </span>
-        </div>
-        <Typography sx={{ fontSize: '36px', fontWeight: 'bold' }}>Register your account</Typography>
-        <Typography sx={{ color: 'rgba(0, 0, 0, 0.5)', fontSize: '16px', }}>Name</Typography>
-        <TextField sx={{ backgroundColor: 'white', borderRadius: '5px', marginBottom: '8px' }} placeholder='Your name ' />
-        <Typography sx={{ color: 'rgba(0, 0, 0, 0.5)', fontSize: '16px' }}>Surname</Typography>
-        <TextField sx={{ backgroundColor: 'white', borderRadius: '5px', marginBottom: '8px' }} placeholder='Your surname' />
-        <Typography sx={{ color: 'rgba(0, 0, 0, 0.5)', fontSize: '16px' }}>Email Address</Typography>
-        <TextField sx={{ backgroundColor: 'white', borderRadius: '5px', marginBottom: '8px' }} placeholder='Your email address' />
-        <Typography sx={{ color: 'rgba(0, 0, 0, 0.5)', fontSize: '16px' }}>Phone number</Typography>
-        <TextField sx={{ backgroundColor: 'white', borderRadius: '5px', marginBottom: '8px' }} placeholder='000-000-0000' />
-        <div>
-          <Typography sx={{ color: 'rgba(0, 0, 0, 0.5)', fontSize: '16px' }}>Password</Typography>
-          <TextField sx={{ backgroundColor: 'white', borderRadius: '5px', marginBottom: '8px' }} placeholder='Password' />
-        </div>
-        <div>
-          <Typography sx={{ color: 'rgba(0, 0, 0, 0.5)', fontSize: '16px' }}>Confirm Password</Typography>
-          <TextField sx={{ backgroundColor: 'white', borderRadius: '5px' }} placeholder='Retype password' />
-        </div>
-        <div style={{ marginTop: '25px', textAlign: 'center' }}>
-          <Button sx={{ backgroundColor: '#B01116', color: 'white', }}>Register account</Button>
-        </div>
-      </div>
+    <div>
+      <h1>My Form</h1>
+      <Formik
+        initialValues={{ name: '', email: '' }}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({ isSubmitting }) => (
+          <Form>
+            <div>
+              <label htmlFor="name">Name</label>
+              <Field type="text" id="name" name="name" />
+              <ErrorMessage name="name" component="div" />
+            </div>
+            <div>
+              <label htmlFor="surname">Surname</label>
+              <Field type="text" id="surname" name="surname" />
+              <ErrorMessage name="surname" component="div" />
+            </div>
+            <div>
+              <label htmlFor="email">Email Address</label>
+              <Field type="email" id="email" name="email" />
+              <ErrorMessage name="email" component="div" />
+            </div>
+            <div>
+              <label htmlFor="number">Phone number</label>
+              <Field type="text" id="number" name="number" />
+              <ErrorMessage name="number" component="div" />
+            </div>
+            <div>
+              <label htmlFor="password">Password</label>
+              <Field type="text" id="password" name="password" />
+              <ErrorMessage name="password" component="div" />
+            </div>
+            <div>
+              <label htmlFor="confirm">Confirm Password</label>
+              <Field type="text" id="confirm" name="confirm" />
+              <ErrorMessage name="confirm" component="div" />
+            </div>
+            <button type="submit" disabled={isSubmitting}>
+              Register
+            </button>
+          </Form>
+        )}
+      </Formik>
     </div>
-
-
-
-
   );
 }
 
